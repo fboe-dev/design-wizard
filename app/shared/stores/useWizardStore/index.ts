@@ -40,8 +40,9 @@ export const DEFAULT_STATE: WizardState = {
     primaryLightness: 0.623,
     neutralBase: "neutral",
   },
-  designStyle: "mixed",
+  designStyle: "standard",
   platformTarget: "web",
+  selectedDevice: "Desktop 1440",
 
   // Step 3
   selectedComponents: [],
@@ -60,6 +61,7 @@ interface WizardActions {
   setColor: (color: Partial<ColorConfig>) => void;
   setDesignStyle: (style: DesignStyle) => void;
   setPlatformTarget: (target: PlatformTarget) => void;
+  setSelectedDevice: (device: string) => void;
 
   // Step 3
   setSelectedComponents: (ids: string[]) => void;
@@ -100,6 +102,7 @@ export const useWizardStore = create<WizardState & WizardActions>()(
         set((s) => ({ color: { ...s.color, ...partial } })),
       setDesignStyle: (designStyle) => set({ designStyle }),
       setPlatformTarget: (platformTarget) => set({ platformTarget }),
+      setSelectedDevice: (selectedDevice) => set({ selectedDevice }),
 
       // Step 3
       setSelectedComponents: (selectedComponents) => set({ selectedComponents }),
@@ -115,7 +118,7 @@ export const useWizardStore = create<WizardState & WizardActions>()(
     }),
     {
       name: "design-wizard-state",
-      version: 3,
+      version: 4,
       migrate: () => DEFAULT_STATE,
     },
   ),

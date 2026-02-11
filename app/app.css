@@ -136,3 +136,27 @@ html {
     @apply bg-background text-foreground;
   }
 }
+
+/* Dotted glow background (aceternity style) */
+.dotted-glow-bg {
+  background-color: var(--background);
+  background-image: radial-gradient(
+    circle at 1px 1px,
+    color-mix(in oklch, var(--muted-foreground) 15%, transparent) 1px,
+    transparent 0
+  );
+  background-size: 24px 24px;
+  position: relative;
+}
+
+.dotted-glow-bg::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle at 50% 50%,
+    color-mix(in oklch, var(--primary) 10%, transparent) 0%,
+    transparent 50%
+  );
+  pointer-events: none;
+}

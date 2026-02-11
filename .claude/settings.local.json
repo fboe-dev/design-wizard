@@ -1,36 +1,12 @@
 {
   "permissions": {
     "allow": [
-      "WebFetch(domain:ui.shadcn.com)",
-      "WebFetch(domain:ant.design)",
+      "Bash(*)",
+      "Read(*)",
+      "Edit(*)",
+      "Write(*)",
       "WebSearch",
-      "Bash(npm install:*)",
-      "Bash(npx react-router typegen:*)",
-      "Bash(curl:*)",
-      "Bash(kill:*)",
-      "Bash(npm run dev:*)",
-      "Bash(lsof:*)",
-      "Bash(xargs kill:*)",
-      "Bash(npx tsc:*)",
-      "Bash(npx shadcn@latest add:*)",
-      "Bash(grep:*)",
-      "mcp__ide__getDiagnostics",
-      "Bash(npx react-router dev:*)",
-      "Bash(npx playwright:*)",
-      "Bash(tr:*)",
-      "WebFetch(domain:fonts.google.com)",
-      "WebFetch(domain:tweakcn.com)",
-      "WebFetch(domain:shadcnstudio.com)",
-      "WebFetch(domain:realtimecolors.com)",
-      "WebFetch(domain:tailkits.com)",
-      "WebFetch(domain:material-foundation.github.io)",
-      "WebFetch(domain:www.telerik.com)",
-      "WebFetch(domain:www.ag-grid.com)",
-      "WebFetch(domain:www.radix-ui.com)",
-      "WebFetch(domain:www.chakra-ui.com)",
-      "WebFetch(domain:www.realtimecolors.com)",
-      "WebFetch(domain:huntscreens.com)",
-      "WebFetch(domain:github.com)"
+      "WebFetch(domain:*)"
     ]
   }
 }

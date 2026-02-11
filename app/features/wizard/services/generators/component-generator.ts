@@ -83,7 +83,7 @@ ${meta.label} 카테고리의 컴포넌트들을 구현하세요.
 - cva (class-variance-authority)로 variant 관리
 - cn() 유틸리티로 클래스 병합
 - Radix UI primitive 기반 (해당되는 경우)
-- 디자인 스타일: **${designStyle}** (${designStyle === "line" ? "아웃라인 위주, 배경색 최소화" : designStyle === "fill" ? "배경색 위주, 아웃라인 최소화" : "상황에 따라 혼합"})
+- 디자인 스타일: **${designStyle}** (${designStyle === "standard" ? "그림자 + 보더 기본 스타일" : designStyle === "flat" ? "그림자 없음, 1px 보더, 플랫 UI" : "보더 없음, 배경색으로 구분하는 미니멀 스타일"})
 - forwardRef 대신 React 19의 ref prop 사용
 - TypeScript strict 모드 호환
 - 반드시 export 해야 하는 것들을 빠뜨리지 마세요

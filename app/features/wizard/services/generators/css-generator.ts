@@ -112,7 +112,7 @@ ${radiusScale}
   };
 }
 
-const FIXED_LABELS = ["5xl", "4xl", "3xl", "2xl", "xl", "lg", "base", "sm", "xs"];
+const FIXED_LABELS = ["2xl", "xl", "lg", "base", "sm", "xs"];
 
 const TW_SIZES_GEN: Record<string, number> = {
   xs: 0.75, sm: 0.875, base: 1, lg: 1.125,
@@ -125,7 +125,7 @@ function buildTypographyScale(t: { baseSize: number; scaleRatio: number }): stri
   return FIXED_LABELS.map((label) => {
     const defaultRem = TW_SIZES_GEN[label] ?? 1;
     const size = Math.round(sizeMultiplier * Math.pow(defaultRem, t.scaleRatio) * 16);
-    const weight = label.includes("xl") ? (label === "xl" ? 700 : 800) : label === "lg" ? 600 : 400;
+    const weight = label === "2xl" ? 800 : label === "xl" ? 700 : label === "lg" ? 600 : 400;
     return `- ${label}: ${size}px (font-weight: ${weight})`;
   }).join("\n");
 }

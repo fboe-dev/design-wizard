@@ -1,6 +1,7 @@
 import { Link } from "react-router";
 import { Wand2, ArrowRight, Layers, Palette, Component, Sparkles } from "lucide-react";
 import { cn } from "@libs/utils";
+import appLogoUrl from "~/assets/app-logo.png";
 
 const FEATURES = [
   {
@@ -31,6 +32,15 @@ export default function HomePage() {
       {/* Hero */}
       <main className="flex flex-1 flex-col items-center justify-center px-6 py-20">
         <div className="mx-auto max-w-2xl text-center">
+          <div className="mb-8 overflow-hidden">
+            <img
+              src={appLogoUrl}
+              alt="Design Wizard Logo"
+              style={{ width: "512px" }}
+              className="max-w-none"
+            />
+          </div>
+
           <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-1.5 text-sm font-medium text-primary">
             <Wand2 className="h-4 w-4" />
             Design System Generator

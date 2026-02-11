@@ -27,44 +27,7 @@ export function ColorPicker({ value, onChange }: ColorPickerProps) {
   return (
     <TooltipProvider>
       <div className="space-y-4">
-        {/* 프리셋 컬러 칩 */}
-        <div className="flex flex-wrap gap-3">
-          {COLOR_PRESETS.map((preset) => (
-            <Tooltip key={preset.name}>
-              <TooltipTrigger asChild>
-                <button
-                  type="button"
-                  onClick={() =>
-                    onChange({
-                      primaryHue: preset.hue,
-                      primaryChroma: preset.chroma,
-                      primaryLightness: preset.lightness,
-                    })
-                  }
-                  className={cn(
-                    "group relative flex h-10 w-10 cursor-pointer items-center justify-center rounded-full transition-all",
-                    "ring-offset-2 ring-offset-background hover:scale-110",
-                    isSelected(preset) && "ring-2 ring-primary",
-                  )}
-                  style={{
-                    backgroundColor: oklchToCSS(
-                      preset.lightness,
-                      preset.chroma,
-                      preset.hue,
-                    ),
-                  }}
-                >
-                  {isSelected(preset) && (
-                    <Check className="h-4 w-4 text-white drop-shadow-sm" />
-                  )}
-                </button>
-              </TooltipTrigger>
-              <TooltipContent>{preset.name}</TooltipContent>
-            </Tooltip>
-          ))}
-        </div>
-
-        {/* 미리보기 */}
+        {/* Light/Dark 미리보기 — 상단 배치 */}
         <div className="grid grid-cols-2 gap-3">
           <div className="space-y-2">
             <p className="text-xs font-medium text-muted-foreground">Light</p>
@@ -143,6 +106,43 @@ export function ColorPicker({ value, onChange }: ColorPickerProps) {
               </div>
             </div>
           </div>
+        </div>
+
+        {/* 프리셋 컬러 칩 */}
+        <div className="flex flex-wrap gap-3">
+          {COLOR_PRESETS.map((preset) => (
+            <Tooltip key={preset.name}>
+              <TooltipTrigger asChild>
+                <button
+                  type="button"
+                  onClick={() =>
+                    onChange({
+                      primaryHue: preset.hue,
+                      primaryChroma: preset.chroma,
+                      primaryLightness: preset.lightness,
+                    })
+                  }
+                  className={cn(
+                    "group relative flex h-10 w-10 cursor-pointer items-center justify-center rounded-full transition-all",
+                    "ring-offset-2 ring-offset-background hover:scale-110",
+                    isSelected(preset) && "ring-2 ring-primary",
+                  )}
+                  style={{
+                    backgroundColor: oklchToCSS(
+                      preset.lightness,
+                      preset.chroma,
+                      preset.hue,
+                    ),
+                  }}
+                >
+                  {isSelected(preset) && (
+                    <Check className="h-4 w-4 text-white drop-shadow-sm" />
+                  )}
+                </button>
+              </TooltipTrigger>
+              <TooltipContent>{preset.name}</TooltipContent>
+            </Tooltip>
+          ))}
         </div>
       </div>
     </TooltipProvider>

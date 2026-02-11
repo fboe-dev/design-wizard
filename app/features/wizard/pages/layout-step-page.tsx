@@ -49,7 +49,6 @@ function LandingPreview() {
 }
 
 // ── 페이지 레이아웃 와이어프레임 ──
-// 1. 심플: 타이틀 + 설명 + 콘텐츠
 function SimplePagePreview() {
   return (
     <div className="flex h-16 flex-col gap-0.5 p-1">
@@ -59,7 +58,6 @@ function SimplePagePreview() {
     </div>
   );
 }
-// 2. 탭: 타이틀 + 설명 + 탭 + 콘텐츠
 function TabPagePreview() {
   return (
     <div className="flex h-16 flex-col gap-0.5 p-1">
@@ -74,7 +72,6 @@ function TabPagePreview() {
     </div>
   );
 }
-// 3. 측면 사이드바: 왼쪽 사이드바 + 오른쪽 심플페이지
 function SidebarPagePreview() {
   return (
     <div className="flex h-16 gap-1 p-1">
@@ -92,7 +89,6 @@ function SidebarPagePreview() {
     </div>
   );
 }
-// 4. 대시보드 그리드
 function DashboardGridPreview() {
   return (
     <div className="flex h-16 flex-col gap-0.5 p-1">
@@ -181,6 +177,8 @@ export default function LayoutStepPage() {
   const { appShellLayout, setAppShellLayout, pageLayout, setPageLayout } =
     useWizardStore();
 
+  const isLanding = appShellLayout === "landing";
+
   return (
     <div className="mx-auto max-w-5xl px-6 py-8 space-y-10">
       {/* 네비게이션 유형 */}
@@ -211,18 +209,21 @@ export default function LayoutStepPage() {
         <div>
           <h2 className="text-lg font-bold">페이지 레이아웃</h2>
           <p className="text-sm text-muted-foreground">
-            페이지 내부 콘텐츠의 기본 구성을 선택하세요
+            {isLanding
+              ? "랜딩페이지는 페이지 레이아웃을 사용하지 않습니다"
+              : "페이지 내부 콘텐츠의 기본 구성을 선택하세요"}
           </p>
         </div>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {PAGE_LAYOUTS.map((layout) => (
             <OptionCard
               key={layout.value}
-              selected={pageLayout === layout.value}
+              selected={!isLanding && pageLayout === layout.value}
               onClick={() => setPageLayout(layout.value)}
               title={layout.title}
               description={layout.description}
               preview={layout.preview}
+              disabled={isLanding}
             />
           ))}
         </div>

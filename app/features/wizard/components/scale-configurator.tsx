@@ -49,7 +49,7 @@ function SliderRow({ label, value, min, max, step, onChange, unit = "", ticks }:
 const TW_SIZES: Record<string, number> = {
   xs: 0.75, sm: 0.875, base: 1, lg: 1.125,
   xl: 1.25, "2xl": 1.5, "3xl": 1.875, "4xl": 2.25,
-  "5xl": 3, "6xl": 3.75,
+  "5xl": 3,
 };
 
 // ── 타이포그래피 스케일 라벨 ──

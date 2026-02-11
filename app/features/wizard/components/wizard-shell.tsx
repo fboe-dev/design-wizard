@@ -1,9 +1,10 @@
 import { useEffect } from "react";
-import { Outlet, useLocation } from "react-router";
+import { Link, Outlet, useLocation } from "react-router";
 import { Moon, Sun } from "lucide-react";
 import { usePreviewUI } from "@stores/useWizardStore";
 import { StepIndicator } from "./step-indicator";
-import { StepNavigation } from "./step-navigation";
+import { FloatingNavigation } from "./floating-navigation";
+import appIconUrl from "~/assets/app-icon.png";
 
 const STEPS = [
   { path: "/wizard/layout",     label: "레이아웃",     step: 1 },
@@ -25,11 +26,24 @@ export default function WizardShell() {
 
   return (
     <div className="flex min-h-dvh flex-col">
-      {/* 헤더: 스텝 인디케이터 + 다크모드 토글 + 네비게이션 */}
-      <header className="border-b border-border bg-background/80 backdrop-blur-sm sticky top-0 z-50">
-        <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-3">
-          <StepIndicator steps={STEPS} current={current} />
-          <div className="flex items-center gap-2">
+      {/* 헤더: 브랜드 + StepIndicator + 다크모드 토글 */}
+      <header className="sticky top-0 z-50 h-14 border-b border-border/50 bg-background/95 shadow-sm backdrop-blur-md">
+        <div className="grid h-full grid-cols-[auto_1fr_auto] items-center gap-4 px-6">
+          {/* 좌: 브랜드 (로고 + 텍스트) */}
+          <Link to="/" className="flex items-center gap-2">
+            <img src={appIconUrl} alt="Design Wizard" className="h-8 w-8" />
+            <span className="hidden text-sm font-bold text-foreground sm:inline">
+              Design Wizard
+            </span>
+          </Link>
+
+          {/* 중앙: StepIndicator */}
+          <div className="flex items-center justify-center">
+            <StepIndicator steps={STEPS} current={current} />
+          </div>
+
+          {/* 우: 다크모드 토글 */}
+          <div className="flex items-center justify-end">
             <button
               type="button"
               onClick={togglePreviewDark}
@@ -38,7 +52,6 @@ export default function WizardShell() {
             >
               {previewDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
             </button>
-            <StepNavigation steps={STEPS} current={current} />
           </div>
         </div>
       </header>
@@ -47,6 +60,9 @@ export default function WizardShell() {
       <main className="flex-1">
         <Outlet />
       </main>
+
+      {/* 플로팅 네비게이션 */}
+      <FloatingNavigation steps={STEPS} current={current} />
     </div>
   );
 }

@@ -2,11 +2,20 @@ import { useState } from "react";
 import { cn } from "@libs/utils";
 import { FONT_GROUPS } from "../constants";
 import { Check } from "lucide-react";
+import { ScrollArea } from "@shadcn/scroll-area";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@shadcn/select";
 import type { FontConfig } from "../types";
 
 interface FontSelectorProps {
   value: FontConfig;
   onChange: (font: FontConfig) => void;
+  onLanguageChange?: (languageId: string) => void;
 }
 
 const WEIGHT_NAMES: Record<number, string> = {
@@ -24,7 +33,7 @@ const WEIGHT_NAMES: Record<number, string> = {
 
 const DISPLAY_WEIGHTS = [300, 400, 600, 700];
 
-export function FontSelector({ value, onChange }: FontSelectorProps) {
+export function FontSelector({ value, onChange, onLanguageChange }: FontSelectorProps) {
   // 현재 선택된 폰트가 속한 그룹을 기본 활성 그룹으로
   const initialGroup = FONT_GROUPS.find((g) =>
     g.fonts.some((f) => f.fontFamily === value.fontFamily),
@@ -33,38 +42,39 @@ export function FontSelector({ value, onChange }: FontSelectorProps) {
 
   const activeGroup = FONT_GROUPS.find((g) => g.id === activeGroupId)!;
 
+  function handleGroupChange(groupId: string) {
+    setActiveGroupId(groupId);
+    onLanguageChange?.(groupId);
+  }
+
   return (
     <div className="space-y-3">
-      {/* 언어 그룹 탭 */}
-      <div className="flex flex-wrap gap-1.5">
-        {FONT_GROUPS.map((group) => {
-          const isActive = group.id === activeGroupId;
-          const hasSelected = group.fonts.some((f) => f.fontFamily === value.fontFamily);
-          return (
-            <button
-              key={group.id}
-              type="button"
-              onClick={() => setActiveGroupId(group.id)}
-              className={cn(
-                "cursor-pointer rounded-md px-2.5 py-1 text-xs font-medium transition-colors",
-                isActive
-                  ? "bg-foreground text-background"
-                  : hasSelected
-                    ? "bg-primary/10 text-primary hover:bg-primary/15"
-                    : "bg-muted text-muted-foreground hover:text-foreground",
-              )}
-            >
-              {group.label}
-              {hasSelected && !isActive && (
-                <span className="ml-1 inline-block h-1.5 w-1.5 rounded-full bg-primary" />
-              )}
-            </button>
-          );
-        })}
-      </div>
+      {/* 언어 그룹 Select 드롭다운 */}
+      <Select value={activeGroupId} onValueChange={handleGroupChange}>
+        <SelectTrigger className="w-full cursor-pointer">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          {FONT_GROUPS.map((group) => {
+            const hasSelected = group.fonts.some((f) => f.fontFamily === value.fontFamily);
+            return (
+              <SelectItem key={group.id} value={group.id}>
+                <span className="flex items-center gap-2">
+                  <span>{group.flag}</span>
+                  {group.label}
+                  {hasSelected && (
+                    <span className="inline-block h-1.5 w-1.5 rounded-full bg-primary" />
+                  )}
+                </span>
+              </SelectItem>
+            );
+          })}
+        </SelectContent>
+      </Select>
 
-      {/* 선택된 그룹의 폰트 목록 */}
-      <div className="space-y-2">
+      {/* 선택된 그룹의 폰트 목록 — 고정 높이 ScrollArea + 외곽선 */}
+      <ScrollArea className="h-[360px] border border-muted rounded-lg">
+      <div className="space-y-2 p-3">
         {activeGroup.fonts.map((font) => {
           const selected = value.fontFamily === font.fontFamily;
           const weightRange = font.variable
@@ -113,6 +123,7 @@ export function FontSelector({ value, onChange }: FontSelectorProps) {
           );
         })}
       </div>
+      </ScrollArea>
     </div>
   );
 }

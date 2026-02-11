@@ -29,8 +29,8 @@ export interface ColorConfig {
   neutralBase: string;
 }
 
-export type DesignStyle = "line" | "fill" | "mixed";
-export type PlatformTarget = "web" | "mobile" | "both";
+export type DesignStyle = "standard" | "flat" | "lineless";
+export type PlatformTarget = "web" | "tablet" | "mobile";
 
 // ── 컴포넌트 ──
 export interface ComponentOption {
@@ -64,6 +64,7 @@ export interface WizardState {
   color: ColorConfig;
   designStyle: DesignStyle;
   platformTarget: PlatformTarget;
+  selectedDevice: string;
 
   // Step 3
   selectedComponents: string[];

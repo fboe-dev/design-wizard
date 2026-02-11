@@ -10,6 +10,7 @@ interface OptionCardProps {
   icon?: ReactNode;
   preview?: ReactNode;
   className?: string;
+  disabled?: boolean;
 }
 
 export function OptionCard({
@@ -20,22 +21,28 @@ export function OptionCard({
   icon,
   preview,
   className,
+  disabled,
 }: OptionCardProps) {
   return (
     <button
       type="button"
-      onClick={onClick}
+      onClick={disabled ? undefined : onClick}
+      disabled={disabled}
       className={cn(
-        "relative flex cursor-pointer flex-col items-start gap-3 rounded-xl border p-4 text-left transition-colors",
-        "hover:border-primary/50 hover:bg-accent/50",
-        selected
-          ? "border-primary bg-primary/5"
-          : "border-border bg-card",
+        "relative flex flex-col items-start gap-3 rounded-xl border p-4 text-left transition-colors",
+        disabled
+          ? "cursor-not-allowed border-border bg-muted/30 opacity-50"
+          : cn(
+              "cursor-pointer hover:border-primary/50 hover:bg-accent/50",
+              selected
+                ? "border-primary bg-primary/5"
+                : "border-border bg-card",
+            ),
         className,
       )}
     >
       {/* 선택 표시 */}
-      {selected && (
+      {selected && !disabled && (
         <div className="absolute right-3 top-3 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-primary-foreground">
           <Check className="h-3 w-3" />
         </div>

@@ -8,8 +8,27 @@ import {
   RadiusConfig as RadiusConfigurator,
 } from "../components/scale-configurator";
 import { LivePreview } from "../components/live-preview";
+import { DEVICE_OPTIONS } from "../constants";
 import type { DesignStyle, PlatformTarget } from "../types";
 import { cn } from "@libs/utils";
+import {
+  ResizablePanelGroup,
+  ResizablePanel,
+  ResizableHandle,
+} from "@shadcn/resizable";
+import {
+  Tooltip,
+  TooltipTrigger,
+  TooltipContent,
+  TooltipProvider,
+} from "@shadcn/tooltip";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@shadcn/select";
 import {
   Type,
   Palette,
@@ -80,7 +99,9 @@ function ToggleChip({
 export default function PrimitivesStepPage() {
   const store = useWizardStore();
   const [activeSection, setActiveSection] = useState<SectionId>("font");
+  const [language, setLanguage] = useState("korean");
   const scrollRef = useRef<HTMLDivElement>(null);
+  const isScrollingRef = useRef(false);
 
   const {
     font, setFont,
@@ -90,9 +111,10 @@ export default function PrimitivesStepPage() {
     color, setColor,
     designStyle, setDesignStyle,
     platformTarget, setPlatformTarget,
+    selectedDevice, setSelectedDevice,
   } = store;
 
-  // IntersectionObserver to track visible section
+  // IntersectionObserver for scroll spy
   useEffect(() => {
     const scrollContainer = scrollRef.current;
     if (!scrollContainer) return;
@@ -103,6 +125,7 @@ export default function PrimitivesStepPage() {
 
     const observer = new IntersectionObserver(
       (entries) => {
+        if (isScrollingRef.current) return;
         for (const entry of entries) {
           if (entry.isIntersecting) {
             const id = entry.target.id.replace("section-", "") as SectionId;
@@ -125,8 +148,13 @@ export default function PrimitivesStepPage() {
   }, []);
 
   function scrollToSection(id: SectionId) {
+    isScrollingRef.current = true;
+    setActiveSection(id);
     const el = scrollRef.current?.querySelector(`#section-${id}`);
     el?.scrollIntoView({ behavior: "smooth" });
+    setTimeout(() => {
+      isScrollingRef.current = false;
+    }, 800);
   }
 
   function handleResetPrimitives() {
@@ -137,119 +165,164 @@ export default function PrimitivesStepPage() {
     setColor(DEFAULT_STATE.color);
     setDesignStyle(DEFAULT_STATE.designStyle);
     setPlatformTarget(DEFAULT_STATE.platformTarget);
+    setSelectedDevice(DEFAULT_STATE.selectedDevice);
+  }
+
+  // 플랫폼 변경 시 디바이스 자동 선택
+  function handlePlatformChange(target: PlatformTarget) {
+    setPlatformTarget(target);
+    const devices = DEVICE_OPTIONS[target];
+    if (devices && devices.length > 0) {
+      setSelectedDevice(devices[0].name);
+    }
   }
 
   return (
-    <div className="flex h-[calc(100dvh-57px)]">
-      {/* 왼쪽 앵커 사이드바 */}
-      <aside className="flex w-[160px] shrink-0 flex-col border-r border-border bg-muted/30 p-3">
-        <button
-          type="button"
-          onClick={handleResetPrimitives}
-          className="mb-3 flex w-full cursor-pointer items-center justify-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-xs text-muted-foreground transition-colors hover:bg-background hover:text-foreground"
-        >
-          <RotateCcw className="h-3 w-3" />
-          기본값
-        </button>
-        <nav className="space-y-1">
-          {SECTIONS.map((section) => (
-            <button
-              key={section.id}
-              type="button"
-              onClick={() => scrollToSection(section.id)}
-              className={cn(
-                "flex w-full cursor-pointer items-center gap-2.5 rounded-lg px-3 py-2 text-sm transition-colors",
-                activeSection === section.id
-                  ? "bg-background font-medium text-foreground"
-                  : "text-muted-foreground hover:bg-background/50 hover:text-foreground",
-              )}
+    <TooltipProvider>
+      <div className="flex h-[calc(100dvh-57px)]">
+        {/* 아이콘 사이드바 */}
+        <aside className="flex w-14 shrink-0 flex-col items-center border-r border-border bg-muted/30 py-3">
+          <nav className="flex flex-1 flex-col items-center gap-1">
+            {SECTIONS.map((section) => (
+              <Tooltip key={section.id}>
+                <TooltipTrigger asChild>
+                  <button
+                    type="button"
+                    onClick={() => scrollToSection(section.id)}
+                    className={cn(
+                      "flex h-9 w-9 cursor-pointer items-center justify-center rounded-lg transition-colors",
+                      activeSection === section.id
+                        ? "bg-background text-foreground shadow-sm"
+                        : "text-muted-foreground hover:bg-background/50 hover:text-foreground",
+                    )}
+                  >
+                    <section.icon className="h-4 w-4" />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent side="right">{section.label}</TooltipContent>
+              </Tooltip>
+            ))}
+          </nav>
+
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                type="button"
+                onClick={handleResetPrimitives}
+                className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-background hover:text-foreground"
+              >
+                <RotateCcw className="h-3.5 w-3.5" />
+              </button>
+            </TooltipTrigger>
+            <TooltipContent side="right">기본값</TooltipContent>
+          </Tooltip>
+        </aside>
+
+        {/* 리사이즈 가능한 컨트롤 + 프리뷰 */}
+        <ResizablePanelGroup orientation="horizontal">
+          {/* 컨트롤 패널 */}
+          <ResizablePanel defaultSize={40} minSize={30}>
+            <div
+              ref={scrollRef}
+              className="h-full overflow-y-auto p-6 pb-24 space-y-10"
             >
-              <section.icon className="h-4 w-4" />
-              {section.label}
-            </button>
-          ))}
-        </nav>
-      </aside>
+              <section id="section-font" className="space-y-4">
+                <SectionHeader icon={Type} title="폰트" description="프로젝트에 사용할 기본 서체를 선택하세요" />
+                <FontSelector value={font} onChange={setFont} />
+              </section>
 
-      {/* 가운데 컨트롤 컬럼 */}
-      <div
-        ref={scrollRef}
-        className="w-[480px] shrink-0 overflow-y-auto border-r border-border p-6 space-y-10"
-      >
-        <section id="section-font" className="space-y-4">
-          <SectionHeader icon={Type} title="폰트" description="프로젝트에 사용할 기본 서체를 선택하세요" />
-          <FontSelector value={font} onChange={setFont} />
-        </section>
+              <section id="section-color" className="space-y-4">
+                <SectionHeader icon={Palette} title="컬러" description="브랜드 Primary 컬러를 선택하세요" />
+                <ColorPicker value={color} onChange={setColor} />
+              </section>
 
-        <section id="section-color" className="space-y-4">
-          <SectionHeader icon={Palette} title="컬러" description="브랜드 Primary 컬러를 선택하세요" />
-          <ColorPicker value={color} onChange={setColor} />
-        </section>
+              <section id="section-typography" className="space-y-4">
+                <SectionHeader icon={ALargeSmall} title="타이포그래피" description="텍스트 크기 스케일을 설정하세요" />
+                <TypographyConfig
+                  baseSize={typography.baseSize}
+                  scaleRatio={typography.scaleRatio}
+                  onChange={(partial) => setTypography(partial as any)}
+                />
+              </section>
 
-        <section id="section-typography" className="space-y-4">
-          <SectionHeader icon={ALargeSmall} title="타이포그래피" description="텍스트 크기 스케일을 설정하세요" />
-          <TypographyConfig
-            baseSize={typography.baseSize}
-            scaleRatio={typography.scaleRatio}
-            onChange={(partial) => setTypography(partial as any)}
-          />
-        </section>
+              <section id="section-spacing" className="space-y-4">
+                <SectionHeader icon={Space} title="스페이싱" description="간격 밀도를 선택하세요" />
+                <SpacingConfigurator
+                  baseUnit={spacing.baseUnit}
+                  onChange={(partial) => setSpacing(partial as any)}
+                />
+              </section>
 
-        <section id="section-spacing" className="space-y-4">
-          <SectionHeader icon={Space} title="스페이싱" description="간격 밀도를 선택하세요" />
-          <SpacingConfigurator
-            baseUnit={spacing.baseUnit}
-            onChange={(partial) => setSpacing(partial as any)}
-          />
-        </section>
+              <section id="section-radius" className="space-y-4">
+                <SectionHeader icon={Circle} title="라운딩" description="모서리 둥근 정도를 설정하세요" />
+                <RadiusConfigurator
+                  baseRadius={radius.baseRadius}
+                  onChange={(partial) => setRadius(partial as any)}
+                />
+              </section>
 
-        <section id="section-radius" className="space-y-4">
-          <SectionHeader icon={Circle} title="라운딩" description="모서리 둥근 정도를 설정하세요" />
-          <RadiusConfigurator
-            baseRadius={radius.baseRadius}
-            onChange={(partial) => setRadius(partial as any)}
-          />
-        </section>
-
-        <section id="section-style" className="space-y-4">
-          <SectionHeader icon={Paintbrush} title="스타일" description="UI 스타일과 타겟 플랫폼을 선택하세요" />
-          <div className="space-y-2">
-            <p className="text-sm font-medium">디자인 스타일</p>
-            <div className="flex gap-2">
-              {([
-                { value: "line" as DesignStyle, label: "Line" },
-                { value: "fill" as DesignStyle, label: "Fill" },
-                { value: "mixed" as DesignStyle, label: "Mixed" },
-              ]).map((opt) => (
-                <ToggleChip key={opt.value} selected={designStyle === opt.value} onClick={() => setDesignStyle(opt.value)}>
-                  {opt.label}
-                </ToggleChip>
-              ))}
+              <section id="section-style" className="space-y-4">
+                <SectionHeader icon={Paintbrush} title="스타일" description="UI 스타일과 타겟 플랫폼을 선택하세요" />
+                <div className="space-y-2">
+                  <p className="text-sm font-medium">디자인 스타일</p>
+                  <div className="flex gap-2">
+                    {([
+                      { value: "standard" as DesignStyle, label: "Standard" },
+                      { value: "flat" as DesignStyle, label: "Flat" },
+                      { value: "lineless" as DesignStyle, label: "Lineless" },
+                    ]).map((opt) => (
+                      <ToggleChip key={opt.value} selected={designStyle === opt.value} onClick={() => setDesignStyle(opt.value)}>
+                        {opt.label}
+                      </ToggleChip>
+                    ))}
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <p className="text-sm font-medium">타겟 플랫폼</p>
+                  <div className="flex gap-2">
+                    {([
+                      { value: "web" as PlatformTarget, label: "Web" },
+                      { value: "tablet" as PlatformTarget, label: "Tablet" },
+                      { value: "mobile" as PlatformTarget, label: "Mobile" },
+                    ]).map((opt) => (
+                      <ToggleChip key={opt.value} selected={platformTarget === opt.value} onClick={() => handlePlatformChange(opt.value)}>
+                        {opt.label}
+                      </ToggleChip>
+                    ))}
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <p className="text-sm font-medium">디바이스 사이즈</p>
+                  <Select value={selectedDevice} onValueChange={setSelectedDevice}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {DEVICE_OPTIONS[platformTarget].map((device) => (
+                        <SelectItem key={device.name} value={device.name}>
+                          {device.name} ({device.width}x{device.height})
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </section>
             </div>
-          </div>
-          <div className="space-y-2">
-            <p className="text-sm font-medium">타겟 플랫폼</p>
-            <div className="flex gap-2">
-              {([
-                { value: "web" as PlatformTarget, label: "Web" },
-                { value: "mobile" as PlatformTarget, label: "Mobile" },
-                { value: "both" as PlatformTarget, label: "Both" },
-              ]).map((opt) => (
-                <ToggleChip key={opt.value} selected={platformTarget === opt.value} onClick={() => setPlatformTarget(opt.value)}>
-                  {opt.label}
-                </ToggleChip>
-              ))}
-            </div>
-          </div>
-        </section>
-      </div>
+          </ResizablePanel>
 
-      {/* 오른쪽 LivePreview — sticky */}
-      <div className="flex min-w-0 flex-1 items-start p-6">
-        <div className="sticky top-6 w-full">
-          <LivePreview state={store} />
-        </div>
+          <ResizableHandle withHandle />
+
+          {/* 프리뷰 패널 */}
+          <ResizablePanel defaultSize={60} minSize={30}>
+            <div className="flex h-full flex-col">
+              {/* 프리뷰 콘텐츠 */}
+              <div className="flex min-h-0 flex-1 items-center overflow-auto p-4">
+                <LivePreview state={store} language={language} />
+              </div>
+            </div>
+          </ResizablePanel>
+        </ResizablePanelGroup>
       </div>
-    </div>
+    </TooltipProvider>
   );
 }
